@@ -84,6 +84,40 @@ Detailed design (Mermaid, data model, failure modes): [docs/architecture.md](doc
 
 ---
 
+## Screenshots
+
+### Home
+
+![FocusFlow AI landing page](docs/images/how-landing-page-looks.png)
+
+![Brain dump prompt example](docs/images/prompt-example.png)
+
+### Generated plans
+
+![Generated plan — priority, schedule, tip, and motivation](docs/images/plan-1-generated.png)
+
+![Generated plan — priority and schedule](docs/images/plan-2-priority.png)
+
+![Generated plan — schedule, focus tip, and motivation](docs/images/plan-2-focus-tips.png)
+
+![Generated plan from a custom brain dump](docs/images/plan-3-generated.png)
+
+### Focus tip & motivation
+
+![Focus tip and motivation cards](docs/images/focus-tip-1.png)
+
+![Focus tip and motivation cards — example 2](docs/images/focus-tip-2.png)
+
+![Focus tip and motivation cards — example 3](docs/images/focus-tip-3.png)
+
+### History
+
+![History page — saved plans list](docs/images/history-page.png)
+
+![History — expanded saved plan, newest first](docs/images/saved-plans-newest-first.png)
+
+---
+
 ## Live Deployment (`us-east-1`)
 
 | Resource | Value |
