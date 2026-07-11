@@ -49,7 +49,8 @@ class BedrockClient:
                 ],
                 inferenceConfig={
                     "maxTokens": 1500,
-                    "temperature": 0.2,
+                    # Slightly higher temperature so tips/motivation vary across runs.
+                    "temperature": 0.55,
                     "topP": 0.9,
                 },
             )

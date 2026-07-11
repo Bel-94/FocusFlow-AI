@@ -8,12 +8,28 @@ from __future__ import annotations
 import streamlit as st
 
 from api_client import ApiError, generate_plan, get_api_base_url
-from styles import inject_styles, render_brand, render_list_panel, render_text_panel
+from styles import (
+    inject_styles,
+    render_brand,
+    render_list_panel,
+    render_text_panel,
+)
 
 EXAMPLE_TASKS = """- Finish AWS article
 - Study Terraform
 - Prepare mentorship session
 - Grocery shopping"""
+
+
+def _init_state() -> None:
+    if "latest_plan" not in st.session_state:
+        st.session_state.latest_plan = None
+    # Apply deferred textarea updates BEFORE the widget with key="tasks_draft" exists.
+    pending = st.session_state.pop("_pending_tasks_draft", None)
+    if pending is not None:
+        st.session_state.tasks_draft = pending
+    elif "tasks_draft" not in st.session_state:
+        st.session_state.tasks_draft = EXAMPLE_TASKS
 
 
 def main() -> None:
@@ -23,10 +39,11 @@ def main() -> None:
         layout="centered",
         initial_sidebar_state="collapsed",
     )
+    _init_state()
     inject_styles()
     render_brand(
-        "An AI-powered productivity planner that turns your daily brain dump "
-        "into a prioritized action plan."
+        "Turn a messy day into a clear plan; priorities, focus blocks, "
+        "and coaching powered by Amazon Bedrock."
     )
 
     if not get_api_base_url():
@@ -35,28 +52,46 @@ def main() -> None:
             "`.streamlit/secrets.toml` before generating a plan."
         )
 
+    st.markdown(
+        '<p class="ff-composer-label">Today\'s brain dump</p>'
+        '<p class="ff-composer-hint">List everything on your mind. '
+        "After you generate a plan, this box clears so you can start fresh.</p>",
+        unsafe_allow_html=True,
+    )
+
     tasks = st.text_area(
         "Today's brain dump",
-        value=st.session_state.get("tasks_draft", EXAMPLE_TASKS),
         height=220,
-        placeholder="List everything on your mind for today…",
-        label_visibility="visible",
+        placeholder="e.g.\n- Ship the Lambda deploy\n- Prep mentorship notes\n- Buy groceries",
+        label_visibility="collapsed",
+        key="tasks_draft",
     )
-    st.session_state["tasks_draft"] = tasks
 
-    generate = st.button("Generate Plan", type="primary", use_container_width=False)
+    col_generate, col_example, _ = st.columns([1.2, 1, 2])
+    with col_generate:
+        generate = st.button("Generate Plan", type="primary", use_container_width=True)
+    with col_example:
+        load_example = st.button("Load example", use_container_width=True)
+
+    if load_example:
+        # Defer mutation until the next run (before the widget is created).
+        st.session_state._pending_tasks_draft = EXAMPLE_TASKS
+        st.rerun()
 
     if generate:
-        if not tasks.strip():
+        if not str(tasks).strip():
             st.error("Add at least one task before generating a plan.")
         else:
             with st.spinner("Shaping your focus plan with Amazon Bedrock…"):
                 try:
-                    plan = generate_plan(tasks)
-                    st.session_state["latest_plan"] = plan
+                    plan = generate_plan(str(tasks))
+                    st.session_state.latest_plan = plan
+                    # Clear on the next run so Streamlit allows the widget key update.
+                    st.session_state._pending_tasks_draft = ""
+                    st.rerun()
                 except ApiError as exc:
-                    st.session_state.pop("latest_plan", None)
-                    detail = f" (HTTP {exc.status_code})" if exc.status_code else ""
+                    st.session_state.latest_plan = None
+                    detail = f" (HTTP {exc.status_code})" if getattr(exc, "status_code", None) else ""
                     st.error(f"{exc}{detail}")
 
     plan = st.session_state.get("latest_plan")
@@ -65,7 +100,11 @@ def main() -> None:
 
 
 def _render_plan(plan: dict) -> None:
-    st.markdown("### Your plan")
+    st.markdown('<p class="ff-results-title">Your plan</p>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="ff-results-sub">Prioritized and scheduled from your last brain dump.</p>',
+        unsafe_allow_html=True,
+    )
 
     if plan.get("warning"):
         st.warning(str(plan["warning"]))
@@ -75,10 +114,14 @@ def _render_plan(plan: dict) -> None:
     focus_tip = plan.get("focus_tip") or ""
     motivation = plan.get("motivation") or ""
 
-    render_list_panel("Priority", [str(item) for item in priority], ordered=True)
-    render_list_panel("Schedule", [str(item) for item in schedule], ordered=True)
-    render_text_panel("Focus tip", str(focus_tip))
-    render_text_panel("Motivation", str(motivation))
+    render_list_panel("Priority", [str(item) for item in priority], ordered=True, accent="priority")
+    render_list_panel("Schedule", [str(item) for item in schedule], ordered=True, accent="schedule")
+
+    tip_col, motivation_col = st.columns(2)
+    with tip_col:
+        render_text_panel("Focus tip", str(focus_tip), accent="tip")
+    with motivation_col:
+        render_text_panel("Motivation", str(motivation), accent="motivation")
 
     meta_bits: list[str] = []
     if plan.get("planId"):

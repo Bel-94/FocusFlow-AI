@@ -15,7 +15,10 @@ st.set_page_config(
 )
 
 inject_styles()
-render_brand("Revisit plans you generated earlier. Newest first.")
+render_brand(
+    "Revisit plans you generated earlier — newest first.",
+    kicker="Saved plans · DynamoDB",
+)
 
 if not get_api_base_url():
     st.warning(
@@ -60,11 +63,24 @@ else:
                 "Priority",
                 [str(item) for item in (plan.get("priority") or [])],
                 ordered=True,
+                accent="priority",
             )
             render_list_panel(
                 "Schedule",
                 [str(item) for item in (plan.get("schedule") or [])],
                 ordered=True,
+                accent="schedule",
             )
-            render_text_panel("Focus tip", str(plan.get("focus_tip") or ""))
-            render_text_panel("Motivation", str(plan.get("motivation") or ""))
+            tip_col, motivation_col = st.columns(2)
+            with tip_col:
+                render_text_panel(
+                    "Focus tip",
+                    str(plan.get("focus_tip") or ""),
+                    accent="tip",
+                )
+            with motivation_col:
+                render_text_panel(
+                    "Motivation",
+                    str(plan.get("motivation") or ""),
+                    accent="motivation",
+                )
