@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Streamlit
+**/.streamlit/secrets.toml
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+# Keep .terraform.lock.hcl committed for reproducible provider versions
+*.tfplan
+tfplan
+
+# Lambda packaging artifacts
+backend/package/
+backend/*.zip
+terraform/build/
+terraform/*.zip
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Screenshots may be large; keep folder, ignore accidental dumps if needed
+# screenshots/*.png is intentionally tracked for the challenge demo

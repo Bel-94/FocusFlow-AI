@@ -1,0 +1,9 @@
+# FocusFlow AI — Lambda dependencies
+#
+# AWS Lambda Python 3.12 already includes boto3 and botocore.
+# No third-party packages are required for deployment via Terraform zip.
+#
+# For local unit tests / REPL only, you may install:
+#   pip install boto3
+#
+# Keep this file so the project layout stays explicit.

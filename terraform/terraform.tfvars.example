@@ -1,0 +1,27 @@
+# Copy to terraform.tfvars and adjust. Never commit terraform.tfvars.
+
+aws_region   = "us-east-1"
+project_name = "focusflow-ai"
+environment  = "challenge"
+
+dynamodb_table_name = "FocusPlans"
+bedrock_model_id    = "amazon.nova-lite-v1:0"
+
+lambda_memory_size = 256
+lambda_timeout     = 30
+log_retention_days = 14
+
+# Tighten to your Amplify URL after first frontend deploy, e.g.:
+# cors_allow_origins = ["https://main.d1234abcd.amplifyapp.com"]
+cors_allow_origins = ["*"]
+
+history_limit   = 20
+max_tasks_chars = 4000
+
+# Amplify: leave repository empty to create the app shell, then connect GitHub in the console.
+# Set amplify_enable_branch = true only after the repo is connected (or when token + URL are set).
+amplify_app_name        = ""
+amplify_repository_url  = ""
+amplify_access_token    = ""
+amplify_branch_name     = "main"
+amplify_enable_branch   = false
